@@ -12,7 +12,7 @@ public abstract class Entity {
 
     protected final double GRAVITY = .5;
     protected final double MAX_VERTICAL_VELOCITY = 50;
-    protected final double MAX_HORIZONTAL_VELOCITY = 30;
+    protected final double MAX_HORIZONTAL_VELOCITY = 20;
     protected final float DECELERATION_RATE = 0.34f;
     private int SIDE_COLLISION_WIDTH, SIDE_COLLISION_HEIGHT;
 
@@ -140,7 +140,7 @@ public abstract class Entity {
 
         public void checkBlockCollision(int x, int y) {
         if(x >= (int)entity.getMinX() / Tile.getTileSize() && x <= (int)entity.getMaxX() / Tile.getTileSize()
-                && y == (int)entity.getMinY() / Tile.getTileSize())
+                && y <= (int)entity.getMinY() / Tile.getTileSize() && y >= (int) entity.getMaxY() / Tile.getTileSize() - 1)
                     return;
         Rectangle b = new Rectangle(x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
                 Tile.getTileSize());

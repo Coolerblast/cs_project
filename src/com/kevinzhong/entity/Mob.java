@@ -10,12 +10,18 @@ public abstract class Mob extends Entity {
     private double moveSpeed;
     private Animation playerWalk;
     private boolean facingRight;
+    private int health;
 
-    public Mob(int w, int h) {
+    public Mob(int w, int h, int health) {
         super(w, h);
         leftAccel = false;
         rightAccel = false;
         facingRight = true;
+        this.health = health;
+    }
+
+    public Mob(int w, int h) {
+        this(w, h, 100);
     }
 
     public void update() {
@@ -41,6 +47,14 @@ public abstract class Mob extends Entity {
 
         playerWalk.setSpeed((int) Math.abs(super.getxVel()));
 
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
     }
 
     public void render(Graphics2D g) {

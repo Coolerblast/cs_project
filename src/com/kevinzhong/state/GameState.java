@@ -74,7 +74,7 @@ public class GameState extends State {
                 System.out.println("Problem occurred while loading save!");
             }
         } else {
-            tile = new Tile[500][1000];
+            tile = new Tile[150][200];
             setWorldSize(tile[0].length, tile.length);
             for (int y = 0; y < tile.length; y++)
                 for (int x = 0; x < tile[0].length; x++) {
@@ -84,7 +84,7 @@ public class GameState extends State {
             TerrainGenerator.generateTerrain(new Long("47664444444"), tile);
         }
         player.setX(maxTilesX * Tile.getTileSize() / 2);
-        player.setY(195 * Tile.getTileSize());
+        player.setY(96 * Tile.getTileSize());
         items = new LinkedList<>();
 
         /*********************
@@ -93,7 +93,7 @@ public class GameState extends State {
         BufferedImage bg1 = ImageLoader.loadImage("resources/mountains.png");
         BufferedImage after = new BufferedImage(bg1.getWidth() * 2, bg1.getHeight() * 2, BufferedImage.TYPE_INT_ARGB);
         AffineTransform at = new AffineTransform();
-        at.scale(2.0, 2.0);
+        at.scale(3.0, 3.0);
         AffineTransformOp scaleOp =
                 new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
         after = scaleOp.filter(bg1, after);
@@ -108,25 +108,23 @@ public class GameState extends State {
                 / Tile.getTileSize() + 1; y++)
             for (int x = (int) (cam.getX() / Tile.getTileSize()) - 1; x < (int) (cam.getX() + width)
                     / Tile.getTileSize() + 1; x++)
-                if (y < tile.length && x < tile[0].length && !(y < 0 || x < 0)) {
                     if (tile[y][x].getActive() != 0)
                         if (tile[y][x].getType() == 0)
-                            g.drawImage(new ImageIcon("resources/textures/dirt.png").getImage(),
+                            g.drawImage(ImageLoader.loadImage("resources/textures/dirt.png"),
                                     x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
                                     Tile.getTileSize(), null);
                         else if (tile[y][x].getType() == 1)
-                            g.drawImage(new ImageIcon("resources/textures/stone.png").getImage(),
+                            g.drawImage(ImageLoader.loadImage("resources/textures/stone.png"),
                                     x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
                                     Tile.getTileSize(), null);
                         else if (tile[y][x].getType() == 2)
-                            g.drawImage(new ImageIcon("resources/textures/grass.png").getImage(),
+                            g.drawImage(ImageLoader.loadImage("resources/textures/grass.png"),
                                     x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
                                     Tile.getTileSize(), null);
                         else if (tile[y][x].getType() == 3)
-                            g.drawImage(new ImageIcon("resources/textures/plants.png").getImage(),
+                            g.drawImage(ImageLoader.loadImage("resources/textures/plant.png"),
                                     x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
                                     Tile.getTileSize(), null);
-                }
 
         player.render(g);
 
@@ -177,16 +175,16 @@ public class GameState extends State {
             parallaxEngine.setLeft();
         if (player.getxVel() > 1)
             parallaxEngine.setRight();
-        if(player.getyVel() < -1)
+        if (player.getyVel() < -1)
             parallaxEngine.setUp();
-        if(player.getyVel() > 1)
+        if (player.getyVel() > 1)
             parallaxEngine.setDown();
 
         if (Math.abs(player.getxVel()) < 1)
             parallaxEngine.stopHorizontal();
-        if(Math.abs(player.getyVel()) < 1)
+        if (Math.abs(player.getyVel()) < 1)
             parallaxEngine.stopVertical();
-        if(Math.abs(player.getxVel()) > 1 || Math.abs(player.getyVel()) > 1)
+        if (Math.abs(player.getxVel()) > 1 || Math.abs(player.getyVel()) > 1)
             parallaxEngine.update();
     }
 
@@ -201,9 +199,10 @@ public class GameState extends State {
         int by = (int) ((p.getY() + cam.getY()) / (double) Tile.getTileSize());
 
         // Has to place next to active block
-        if (!(tile[by - 1][bx].getActive() != 0 || tile[by + 1][bx].getActive() != 0
-                || tile[by][bx - 1].getActive() != 0 || tile[by][bx + 1].getActive() != 0))
-            return;
+        if(by != 0 && bx != 0 && by != maxTilesY - 1 && bx != maxTilesX - 1)
+            if (!(tile[by - 1][bx].getActive() != 0 || tile[by + 1][bx].getActive() != 0
+                    || tile[by][bx - 1].getActive() != 0 || tile[by][bx + 1].getActive() != 0))
+                return;
         Tile tile = new Tile();
         tile.setType(type);
         if (type == 3) {
@@ -236,6 +235,7 @@ public class GameState extends State {
 
         if (player.getBounds().intersects(temp) || !(this.tile[by][bx].getActive() != 0))
             return;
+
         if (type == 2 && tile[by - 1][bx].getType() == 3)
             tile[by - 1][bx].clear();
         this.tile[by][bx].clear();

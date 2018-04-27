@@ -35,9 +35,9 @@ public class TerrainGenerator {
     private static void generateFlat(Tile[][] tile) {
         int x = 0;
         while (x < GameState.getMaxX()) {
-            tile[200][x].setType(2);
-            tile[200][x].setActive(1);
-            for (int i = 201; i < GameState.getMaxY(); i++) {
+            tile[100][x].setType(2);
+            tile[100][x].setActive(1);
+            for (int i = 101; i < GameState.getMaxY(); i++) {
                 tile[i][x].setType(0);
                 tile[i][x].setActive(1);
             }

@@ -13,6 +13,9 @@ public class ParallaxLayer {
     private boolean left, right, up, down;
 
     public ParallaxLayer(BufferedImage image, int dx, int dy, int gap) {
+        /*******************************************
+         * Make dx and dy based on player movement *
+         *******************************************/
         this.image = image;
         this.dx = dx;
         this.dy = dy;
