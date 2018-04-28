@@ -41,12 +41,7 @@ public class KeyInput implements KeyListener {
 			if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
 				System.exit(0);
 			if (e.getKeyCode() == KeyEvent.VK_BACK_SLASH)
-				try {
 					gameState.save();
-				} catch (FileNotFoundException | UnsupportedEncodingException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 		}
 	}
 

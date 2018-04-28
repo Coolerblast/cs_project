@@ -22,6 +22,7 @@ import com.kevinzhong.handlers.Camera;
 import com.kevinzhong.main.GamePanel;
 import com.kevinzhong.tile.Tile;
 import com.kevinzhong.tilemap.TerrainGenerator;
+import com.kevinzhong.util.ThreadPool;
 
 public class GameState extends State {
     private int width, height;
@@ -33,6 +34,7 @@ public class GameState extends State {
     private ArrayList<Point> points;
     private LinkedList<Item> items;
     private int maxItems = 401;
+    private ThreadPool pool;
 
     private ParallaxEngine parallaxEngine;
 
@@ -99,6 +101,7 @@ public class GameState extends State {
         after = scaleOp.filter(bg1, after);
 
         parallaxEngine = new ParallaxEngine(new ParallaxLayer(after, 2, 3));
+        pool = new ThreadPool();
     }
 
     public void render(Graphics2D g) {
@@ -108,23 +111,24 @@ public class GameState extends State {
                 / Tile.getTileSize() + 1; y++)
             for (int x = (int) (cam.getX() / Tile.getTileSize()) - 1; x < (int) (cam.getX() + width)
                     / Tile.getTileSize() + 1; x++)
-                    if (tile[y][x].getActive() != 0)
-                        if (tile[y][x].getType() == 0)
-                            g.drawImage(ImageLoader.loadImage("resources/textures/dirt.png"),
-                                    x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
-                                    Tile.getTileSize(), null);
-                        else if (tile[y][x].getType() == 1)
-                            g.drawImage(ImageLoader.loadImage("resources/textures/stone.png"),
-                                    x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
-                                    Tile.getTileSize(), null);
-                        else if (tile[y][x].getType() == 2)
-                            g.drawImage(ImageLoader.loadImage("resources/textures/grass.png"),
-                                    x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
-                                    Tile.getTileSize(), null);
-                        else if (tile[y][x].getType() == 3)
-                            g.drawImage(ImageLoader.loadImage("resources/textures/plant.png"),
-                                    x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
-                                    Tile.getTileSize(), null);
+                if(!(x < 0 || y < 0 || x >= maxTilesX || y >= maxTilesY))
+                if (tile[y][x].getActive() != 0)
+                    if (tile[y][x].getType() == 0)
+                        g.drawImage(ImageLoader.loadImage("resources/textures/dirt.png"),
+                                x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
+                                Tile.getTileSize(), null);
+                    else if (tile[y][x].getType() == 1)
+                        g.drawImage(ImageLoader.loadImage("resources/textures/stone.png"),
+                                x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
+                                Tile.getTileSize(), null);
+                    else if (tile[y][x].getType() == 2)
+                        g.drawImage(ImageLoader.loadImage("resources/textures/grass.png"),
+                                x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
+                                Tile.getTileSize(), null);
+                    else if (tile[y][x].getType() == 3)
+                        g.drawImage(ImageLoader.loadImage("resources/textures/plant.png"),
+                                x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
+                                Tile.getTileSize(), null);
 
         player.render(g);
 
@@ -144,7 +148,7 @@ public class GameState extends State {
     }
 
     public void update() {
-        player.update();
+                player.update();
 
         if (player.getPlacingBlocks())
             placeBlock(player.getCurrentBlock(), GamePanel.getMainJFrame().getContentPane().getMousePosition());
@@ -199,7 +203,7 @@ public class GameState extends State {
         int by = (int) ((p.getY() + cam.getY()) / (double) Tile.getTileSize());
 
         // Has to place next to active block
-        if(by != 0 && bx != 0 && by != maxTilesY - 1 && bx != maxTilesX - 1)
+        if (by != 0 && bx != 0 && by != maxTilesY - 1 && bx != maxTilesX - 1)
             if (!(tile[by - 1][bx].getActive() != 0 || tile[by + 1][bx].getActive() != 0
                     || tile[by][bx - 1].getActive() != 0 || tile[by][bx + 1].getActive() != 0))
                 return;
@@ -248,32 +252,42 @@ public class GameState extends State {
         // System.out.println("Broke a block!");
     }
 
-    public void save() throws FileNotFoundException, UnsupportedEncodingException {
-        PrintWriter writer = new PrintWriter("saves/save.txt", "UTF-8");
-        writer.println(tile[0].length);
-        writer.println(tile.length);
-        for (Tile[] b : tile)
-            for (Tile t : b) {
-                writer.print(String.format("%02d", t.getActive()));
-                writer.println(String.format("%04d", t.getType()));
+    public void save() {
+        pool.runTask(new Runnable() {
+            @Override
+            public void run() {
+                PrintWriter writer = null;
+                try {
+                    writer = new PrintWriter("saves/save.txt", "UTF-8");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                writer.println(tile[0].length);
+                writer.println(tile.length);
+                for (Tile[] b : tile)
+                    for (Tile t : b) {
+                        writer.print(String.format("%02d", t.getActive()));
+                        writer.println(String.format("%04d", t.getType()));
+                    }
+                writer.close();
             }
-        writer.close();
+        });
     }
 
     public void drawCollisionBounds(Graphics2D g) {
         g.setColor(Color.green);
-        synchronized (tile) {
-            for (int y = (int) (cam.getY() / Tile.getTileSize()) - 1; y < (int) (cam.getY() + height)
-                    / Tile.getTileSize() + 1; y++)
-                for (int x = (int) (cam.getX() / Tile.getTileSize()); x < (int) (cam.getX() + width)
-                        / Tile.getTileSize(); x++)
-                    if (y < tile.length && x < tile[0].length && !(y < 0 || x < 0))
-                        if (tile[y][x].getActive() == 1) {
-                            Rectangle temp = new Rectangle(x * Tile.getTileSize(), y * Tile.getTileSize(),
-                                    Tile.getTileSize(), Tile.getTileSize());
-                            g.draw(temp.getBounds());
-                        }
-        }
+        for (int y = (int) (cam.getY() / Tile.getTileSize()) - 1; y < (int) (cam.getY() + height)
+                / Tile.getTileSize() + 1; y++)
+            for (int x = (int) (cam.getX() / Tile.getTileSize()) - 1; x < (int) (cam.getX() + width)
+                    / Tile.getTileSize() + 1; x++)
+                if(!(x < 0 || y < 0 || x >= maxTilesX || y >= maxTilesY))
+                if (tile[y][x].getActive() == 1) {
+                    Rectangle temp = new Rectangle(x * Tile.getTileSize(), y * Tile.getTileSize(),
+                            Tile.getTileSize(), Tile.getTileSize());
+                    g.draw(temp.getBounds());
+                }
         g.setColor(Color.green);
         g.draw(player.getTopBounds());
         g.setColor(Color.blue);

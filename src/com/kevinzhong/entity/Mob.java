@@ -32,10 +32,7 @@ public abstract class Mob extends Entity {
         if (leftAccel)
             super.setxVel(super.getxVel() - moveSpeed);
 
-        if(getxVel() > 0)
-            facingRight = true;
-        else if(getxVel() < 0)
-            facingRight = false;
+        facingRight = this.getxVel() > 0 ? true : false;
 
         if (!(leftAccel && rightAccel)) {
             super.setxVel(super.getxVel() * DECELERATION_RATE);
