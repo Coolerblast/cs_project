@@ -237,7 +237,7 @@ public class GameState extends State {
 
         int type = tile[by][bx].getType();
 
-        if (player.getBounds().intersects(temp) || !(this.tile[by][bx].getActive() != 0))
+        if (player.getBounds().intersects(temp) || this.tile[by][bx].getActive() == 0)
             return;
 
         if (type == 2 && tile[by - 1][bx].getType() == 3)

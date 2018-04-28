@@ -150,9 +150,7 @@ public abstract class Entity {
                 entity.setLocation((int) entity.getX(), (int) (b.getBounds().getMinY() - this.getBounds().getHeight()));
                 this.y = b.getBounds().getMinY() - this.getBounds().getHeight();
                 canJump = true;
-                falling = false;
             } else {
-                falling = true;
                 if ((x == (int) this.x || x == (int) this.x + 1) && y == (int) this.y + 3)
                     canJump = false;
             }
@@ -164,7 +162,6 @@ public abstract class Entity {
             }
             yVel = 0;
             canJump = false;
-            falling = true;
         }
 
         if (this.getLeftBounds().intersects(b.getBounds())) {
