@@ -71,6 +71,7 @@ public abstract class Entity {
         if (canJump && yVel <= 3) {
             yVel -= entity.getHeight() * .25;
             canJump = false;
+            falling = true;
         }
     }
 
@@ -145,18 +146,26 @@ public abstract class Entity {
         Rectangle b = new Rectangle(x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
                 Tile.getTileSize());
 
-            if (this.getBottomBounds().intersects(b.getBounds())) {
-                yVel = 0;
-                entity.setLocation((int) entity.getX(), (int) (b.getBounds().getMinY() - this.getBounds().getHeight()));
-                this.y = b.getBounds().getMinY() - this.getBounds().getHeight();
-                canJump = true;
-            } else {
-                if ((x == (int) this.x || x == (int) this.x + 1) && y == (int) this.y + 3)
-                    canJump = false;
-            }
+        boolean top = this.getTopBounds().intersects(b.getBounds()),
+                left = this.getLeftBounds().intersects(b.getBounds()),
+                right = this.getRightBounds().intersects(b.getBounds()),
+                bottom = this.getBottomBounds().intersects(b.getBounds());
 
-        if (this.getTopBounds().intersects(b.getBounds())) {
-            if (!this.getBottomBounds().intersects(b.getBounds())) {
+        if(bottom) {
+            yVel = 0;
+            entity.setLocation((int) entity.getX(), (int) (b.getBounds().getMinY() - this.getBounds().getHeight()));
+            this.y = b.getBounds().getMinY() - this.getBounds().getHeight();
+            canJump = true;
+            falling = false;
+        } else {
+            if ((x == (int) this.x || x == (int) this.x + 1) && y == (int) this.y + 3)
+                canJump = false;
+            falling = true;
+        }
+
+        if(top) {
+            if (bottom) {
+
                 entity.setLocation((int) entity.getX(), (int) b.getBounds().getMaxY());
                 this.y = b.getBounds().getMaxY();
             }
@@ -164,13 +173,13 @@ public abstract class Entity {
             canJump = false;
         }
 
-        if (this.getLeftBounds().intersects(b.getBounds())) {
+        if (left) {
             entity.setLocation((int) b.getBounds().getMaxX(), (int) entity.getY());
             this.x = b.getBounds().getMaxX();
             xVel = 0;
         }
 
-        if (this.getRightBounds().intersects(b.getBounds())) {
+        if (right) {
             entity.setLocation((int) (b.getBounds().getMinX() - this.getBounds().getWidth()), (int) entity.getY());
             this.x = b.getBounds().getMinX() - this.getBounds().getWidth();
             xVel = 0;

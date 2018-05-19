@@ -34,9 +34,13 @@ public class KeyInput implements KeyListener {
 			if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
 				player.setRightAccel(true);
 			}
+
+			if (e.getKeyCode() == KeyEvent.VK_Z) {
+				player.attack();
+			}
+
 			if (e.getKeyCode() == KeyEvent.VK_Q) {
-				player.setX(500 * Tile.getTileSize());
-				player.setY(195 * Tile.getTileSize());
+				player.setHealth(100);
 			}
 			if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
 				System.exit(0);
