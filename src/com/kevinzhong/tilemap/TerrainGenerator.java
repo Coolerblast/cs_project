@@ -40,6 +40,7 @@ public class TerrainGenerator {
             for (int i = 101; i < GameState.getMaxY(); i++) {
                 tile[i][x].setType(0);
                 tile[i][x].setActive(1);
+                tile[i][x].setCanRegenerate(true);
             }
             x++;
         }
@@ -65,6 +66,7 @@ public class TerrainGenerator {
             for (int i = (int) (y + yDif); i < GameState.getMaxY(); i++) {
                 tile[i][x].setType(TileID);
                 tile[i][x].setActive(1);
+                tile[i][x].setCanRegenerate(true);
                 //System.out.println(x + " " + i + " " + tile[i][x].getActive());
             }
 
