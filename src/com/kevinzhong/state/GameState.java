@@ -105,7 +105,7 @@ public class GameState extends State {
         parallaxEngine = new ParallaxEngine(new ParallaxLayer(after, 2, 3));
         pool = new ThreadPool();
 
-        zombie = new Zombie(32,48);
+        zombie = new Zombie(32, 48);
         zombie.setTarget(player);
         zombie.setX(maxTilesX * Tile.getTileSize() / 2 + 64);
         zombie.setY(96 * Tile.getTileSize());
@@ -123,24 +123,24 @@ public class GameState extends State {
                 / Tile.getTileSize() + 1; y++)
             for (int x = (int) (cam.getX() / Tile.getTileSize()) - 1; x < (int) (cam.getX() + width)
                     / Tile.getTileSize() + 1; x++)
-                if(!(x < 0 || y < 0 || x >= maxTilesX || y >= maxTilesY))
-                if (tile[y][x].getActive() != 0)
-                    if (tile[y][x].getType() == 0)
-                        g.drawImage(ImageLoader.loadImage("resources/textures/dirt.png"),
-                                x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
-                                Tile.getTileSize(), null);
-                    else if (tile[y][x].getType() == 1)
-                        g.drawImage(ImageLoader.loadImage("resources/textures/stone.png"),
-                                x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
-                                Tile.getTileSize(), null);
-                    else if (tile[y][x].getType() == 2)
-                        g.drawImage(ImageLoader.loadImage("resources/textures/grass.png"),
-                                x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
-                                Tile.getTileSize(), null);
-                    else if (tile[y][x].getType() == 3)
-                        g.drawImage(ImageLoader.loadImage("resources/textures/plant.png"),
-                                x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
-                                Tile.getTileSize(), null);
+                if (!(x < 0 || y < 0 || x >= maxTilesX || y >= maxTilesY))
+                    if (tile[y][x].getActive() != 0)
+                        if (tile[y][x].getType() == 0)
+                            g.drawImage(ImageLoader.loadImage("resources/textures/dirt.png"),
+                                    x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
+                                    Tile.getTileSize(), null);
+                        else if (tile[y][x].getType() == 1)
+                            g.drawImage(ImageLoader.loadImage("resources/textures/stone.png"),
+                                    x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
+                                    Tile.getTileSize(), null);
+                        else if (tile[y][x].getType() == 2)
+                            g.drawImage(ImageLoader.loadImage("resources/textures/grass.png"),
+                                    x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
+                                    Tile.getTileSize(), null);
+                        else if (tile[y][x].getType() == 3)
+                            g.drawImage(ImageLoader.loadImage("resources/textures/plant.png"),
+                                    x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
+                                    Tile.getTileSize(), null);
 
         player.render(g);
         zombie.render(g);
@@ -150,7 +150,7 @@ public class GameState extends State {
                     i.getBounds().getMinY() > cam.getY() && i.getBounds().getMaxY() < cam.getY() + height)
                 i.render(g);
         }
-       // drawCollisionBounds(g);
+        // drawCollisionBounds(g);
 
         g.setColor(Color.GREEN);
 
@@ -163,22 +163,26 @@ public class GameState extends State {
     }
 
     public void update() {
-                player.update();
-                zombie.update();
+        player.update();
+        zombie.update();
 
         if (player.getPlacingBlocks())
             placeBlock(player.getCurrentBlock(), GamePanel.getMainJFrame().getContentPane().getMousePosition());
         if (player.getBreakingBlocks())
             breakBlock(GamePanel.getMainJFrame().getContentPane().getMousePosition());
 
-        for (Mob mob : mobs)
-        for (int y = (int) mob.getY() - 1; y < (int) mob.getY() + 5; y++)
-            for (int x = (int) mob.getX() - 1; x < (int) mob.getX() + 3; x++)
-                if (y < tile.length && x < tile[0].length && !(y < 0 || x < 0))
-                    if (tile[y][x].getActive() == 1)
-                        mob.checkBlockCollision(x, y);
+        for (Mob mob : mobs) {
+            LinkedList<Point> t = new LinkedList<>();
+            for (int y = (int) mob.getY() - 1; y < (int) mob.getY() + 5; y++)
+                for (int x = (int) mob.getX() - 1; x < (int) mob.getX() + 3; x++)
+                    if (y < tile.length && x < tile[0].length && !(y < 0 || x < 0))
+                        if (tile[y][x].getActive() == 1)
+                            t.add(new Point(x, y));
+            mob.checkBlockCollision(t);
+        }
 
         for (Item i : items) {
+            LinkedList<Point> t = new LinkedList<>();
             if (i.getBounds().getMinX() > cam.getX() && i.getBounds().getMaxX() < cam.getX() + width &&
                     i.getBounds().getMinY() > cam.getY() && i.getBounds().getMaxY() < cam.getY() + height) {
                 i.update();
@@ -186,12 +190,13 @@ public class GameState extends State {
                     for (int x = (int) i.getX() - 1; x < (int) i.getX() + 1; x++)
                         if (y < tile.length && x < tile[0].length && !(y < 0 || x < 0))
                             if (tile[y][x].getActive() == 1)
-                                i.checkBlockCollision(x, y);
+                                t.add(new Point(x, y));
+                i.checkBlockCollision(t);
             }
         }
 
-        for(Tile[] a : tile)
-            for(Tile t : a)
+        for (Tile[] a : tile)
+            for (Tile t : a)
                 t.update();
 
         Item.StackStackableItems(items);
@@ -214,9 +219,9 @@ public class GameState extends State {
         if (Math.abs(player.getxVel()) > 1 || Math.abs(player.getyVel()) > 1)
             parallaxEngine.update();
 
-        for(Mob a : mobs)
-            if(Enemy.class.isInstance(a))
-                if(a.getBounds().intersects(player.getBounds()))
+        for (Mob a : mobs)
+            if (Enemy.class.isInstance(a))
+                if (a.getBounds().intersects(player.getBounds()))
                     a.damage(player);
     }
 
@@ -317,7 +322,7 @@ public class GameState extends State {
         g.setColor(missingColor);
         g.fillRect((int) (cam.getX() + GamePanel.getMainJFrame().getWidth() - barWidth - barLengthFromRight), (int) cam.getY() + barLengthFromTop, barWidth, barHeight);
         g.setColor(healthColor);
-        g.fillRect((int) (cam.getX() + GamePanel.getMainJFrame().getWidth() - barWidth - barLengthFromRight), (int) cam.getY() + barLengthFromTop, (int)(((double)player.getHealth() / player.getMaxHealth()) * barWidth), barHeight);
+        g.fillRect((int) (cam.getX() + GamePanel.getMainJFrame().getWidth() - barWidth - barLengthFromRight), (int) cam.getY() + barLengthFromTop, (int) (((double) player.getHealth() / player.getMaxHealth()) * barWidth), barHeight);
         g.setColor(borderColor);
         g.setStroke(new BasicStroke(3));
         g.drawRect((int) (cam.getX() + GamePanel.getMainJFrame().getWidth() - barWidth - barLengthFromRight), (int) cam.getY() + barLengthFromTop, barWidth, barHeight);
@@ -329,12 +334,12 @@ public class GameState extends State {
                 / Tile.getTileSize() + 1; y++)
             for (int x = (int) (cam.getX() / Tile.getTileSize()) - 1; x < (int) (cam.getX() + width)
                     / Tile.getTileSize() + 1; x++)
-                if(!(x < 0 || y < 0 || x >= maxTilesX || y >= maxTilesY))
-                if (tile[y][x].getActive() == 1) {
-                    Rectangle temp = new Rectangle(x * Tile.getTileSize(), y * Tile.getTileSize(),
-                            Tile.getTileSize(), Tile.getTileSize());
-                    g.draw(temp.getBounds());
-                }
+                if (!(x < 0 || y < 0 || x >= maxTilesX || y >= maxTilesY))
+                    if (tile[y][x].getActive() == 1) {
+                        Rectangle temp = new Rectangle(x * Tile.getTileSize(), y * Tile.getTileSize(),
+                                Tile.getTileSize(), Tile.getTileSize());
+                        g.draw(temp.getBounds());
+                    }
         g.setColor(Color.green);
         g.draw(player.getTopBounds());
         g.setColor(Color.blue);

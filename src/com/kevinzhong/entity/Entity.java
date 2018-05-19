@@ -1,9 +1,8 @@
 package com.kevinzhong.entity;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.LinkedList;
 
 import com.kevinzhong.state.GameState;
 import com.kevinzhong.tile.Tile;
@@ -139,22 +138,51 @@ public abstract class Entity {
                 (int) entity.getHeight() - 2 * SIDE_COLLISION_HEIGHT);
     }
 
-        public void checkBlockCollision(int x, int y) {
-        if(x >= (int)entity.getMinX() / Tile.getTileSize() && x <= (int)entity.getMaxX() / Tile.getTileSize()
-                && y <= (int)entity.getMinY() / Tile.getTileSize() && y >= (int) entity.getMaxY() / Tile.getTileSize() - 1)
-                    return;
-        Rectangle b = new Rectangle(x * Tile.getTileSize(), y * Tile.getTileSize(), Tile.getTileSize(),
-                Tile.getTileSize());
+    public void checkBlockCollision(LinkedList<Point> points) {
+//        if(x >= (int)entity.getMinX() / Tile.getTileSize() && x <= (int)entity.getMaxX() / Tile.getTileSize()
+//                && y <= (int)entity.getMinY() / Tile.getTileSize() && y >= (int) entity.getMaxY() / Tile.getTileSize() - 1)
+//                    return;
 
-        boolean top = this.getTopBounds().intersects(b.getBounds()),
-                left = this.getLeftBounds().intersects(b.getBounds()),
-                right = this.getRightBounds().intersects(b.getBounds()),
+        boolean top = false, left = false, right = false, bottom = false;
+        Rectangle intersectsBottom = new Rectangle(),
+                intersectsTop = new Rectangle(),
+                intersectsLeft = new Rectangle(),
+                intersectsRight = new Rectangle();
+        for (Point p : points) {
+            Rectangle b = new Rectangle(new Point((int) p.getX() * Tile.getTileSize(), (int) p.getY() * Tile.getTileSize()), new Dimension(Tile.getTileSize(), Tile.getTileSize()));
+
+            if (!top) {
+                top = this.getTopBounds().intersects(b.getBounds());
+                intersectsTop = b;
+            }
+            if (!bottom) {
                 bottom = this.getBottomBounds().intersects(b.getBounds());
+                intersectsBottom = b;
+            }
+            if (!left) {
+                left = this.getLeftBounds().intersects(b.getBounds());
+                intersectsLeft = b;
+            }
+            if (!right) {
+                right = this.getRightBounds().intersects(b.getBounds());
+                intersectsRight = b;
+            }
+        }
 
-        if(bottom) {
+        if (top) {
+            if (bottom) {
+
+                entity.setLocation((int) entity.getX(), (int) intersectsTop.getMaxY());
+                this.y = intersectsTop.getMaxY();
+            }
             yVel = 0;
-            entity.setLocation((int) entity.getX(), (int) (b.getBounds().getMinY() - this.getBounds().getHeight()));
-            this.y = b.getBounds().getMinY() - this.getBounds().getHeight();
+            canJump = false;
+        }
+
+        if (bottom) {
+            yVel = 0;
+            entity.setLocation((int) entity.getX(), (int) (intersectsBottom.getMinY() - this.getBounds().getHeight()));
+            this.y = intersectsBottom.getMinY() - this.getBounds().getHeight();
             canJump = true;
             falling = false;
         } else {
@@ -163,28 +191,19 @@ public abstract class Entity {
             falling = true;
         }
 
-        if(top) {
-            if (bottom) {
 
-                entity.setLocation((int) entity.getX(), (int) b.getBounds().getMaxY());
-                this.y = b.getBounds().getMaxY();
+        if (left ^ right) {
+            if (left) {
+                entity.setLocation((int) intersectsLeft.getMaxX(), (int) entity.getY());
+                this.x = intersectsLeft.getMaxX();
+                xVel = 0;
             }
-            yVel = 0;
-            canJump = false;
+            if (right) {
+                entity.setLocation((int) (intersectsRight.getMinX() - this.getBounds().getWidth()), (int) entity.getY());
+                this.x = intersectsRight.getMinX() - this.getBounds().getWidth();
+                xVel = 0;
+            }
         }
-
-        if (left) {
-            entity.setLocation((int) b.getBounds().getMaxX(), (int) entity.getY());
-            this.x = b.getBounds().getMaxX();
-            xVel = 0;
-        }
-
-        if (right) {
-            entity.setLocation((int) (b.getBounds().getMinX() - this.getBounds().getWidth()), (int) entity.getY());
-            this.x = b.getBounds().getMinX() - this.getBounds().getWidth();
-            xVel = 0;
-        }
-
         // System.out.println(canJump);
 
     }
