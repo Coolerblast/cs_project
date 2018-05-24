@@ -4,6 +4,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import com.kevinzhong.entity.Player;
+import com.kevinzhong.main.GamePanel;
 import com.kevinzhong.state.GameState;
 import com.kevinzhong.state.State;
 
@@ -26,6 +27,7 @@ public class MouseInput implements MouseListener {
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				if (!player.getPlacingBlocks())
 					player.setBreakingBlocks(true);
+				player.selectInventorySlot(GamePanel.getMainJFrame().getMousePosition());
 			}
 
 			if (e.getButton() == MouseEvent.BUTTON3) {

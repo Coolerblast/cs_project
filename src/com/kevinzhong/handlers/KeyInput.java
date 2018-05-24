@@ -42,10 +42,27 @@ public class KeyInput implements KeyListener {
 			if (e.getKeyCode() == KeyEvent.VK_Q) {
 				player.setHealth(100);
 			}
-			if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+
+			if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+				player.setInventoryIsOpen(!player.isInventoryIsOpen());
+				System.out.println(player.isInventoryIsOpen());
+			}
+
+			if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
 				System.exit(0);
 			if (e.getKeyCode() == KeyEvent.VK_BACK_SLASH)
 					gameState.save();
+
+			if (e.getKeyCode() == KeyEvent.VK_1) player.setSelectedHotbarSlot(0);
+			if (e.getKeyCode() == KeyEvent.VK_2) player.setSelectedHotbarSlot(1);
+			if (e.getKeyCode() == KeyEvent.VK_3) player.setSelectedHotbarSlot(2);
+			if (e.getKeyCode() == KeyEvent.VK_4) player.setSelectedHotbarSlot(3);
+			if (e.getKeyCode() == KeyEvent.VK_5) player.setSelectedHotbarSlot(4);
+			if (e.getKeyCode() == KeyEvent.VK_6) player.setSelectedHotbarSlot(5);
+			if (e.getKeyCode() == KeyEvent.VK_7) player.setSelectedHotbarSlot(6);
+			if (e.getKeyCode() == KeyEvent.VK_8) player.setSelectedHotbarSlot(7);
+			if (e.getKeyCode() == KeyEvent.VK_9) player.setSelectedHotbarSlot(8);
+			if (e.getKeyCode() == KeyEvent.VK_0) player.setSelectedHotbarSlot(9);
 		}
 	}
 

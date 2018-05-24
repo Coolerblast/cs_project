@@ -1,5 +1,6 @@
 package com.kevinzhong.entity;
 
+import com.kevinzhong.gfx.Animation;
 import com.kevinzhong.gfx.ImageLoader;
 import com.kevinzhong.gfx.SpriteSheet;
 import com.kevinzhong.tile.Tile;
@@ -9,7 +10,7 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
 public class Item extends Entity {
-    private static SpriteSheet itemSheet = new SpriteSheet(ImageLoader.loadImage("resources/spritesheets/itemsprites.png"));
+    private BufferedImage sprite;
     private boolean dropped;
     private boolean inInventory;
     private boolean stackable;
@@ -17,13 +18,15 @@ public class Item extends Entity {
     private int type;
     private static int ItemSize = 12;
 
-    private BufferedImage sprite;
+    public Item() {
+        super(16, 16);
+        getStackable();
+    }
 
     public Item(int t, boolean d) {
         super(16, 16);
         type = t;
         dropped = d;
-        getSprite();
         getStackable();
     }
 
@@ -31,7 +34,6 @@ public class Item extends Entity {
         super(ItemSize, ItemSize);
         type = t;
         dropped = d;
-        getSprite();
         getStackable();
         super.setLocation(x, y);
     }
@@ -93,27 +95,22 @@ public class Item extends Entity {
         return -1;
     }
 
-    public void setSprite(BufferedImage sprite) {
-        this.sprite = sprite;
+    public void setSprite(BufferedImage image) {
+        this.sprite = image;
     }
 
-    private void getSprite() {
-        if (type == 0)
-            this.setSprite(itemSheet.crop(0, 0, 8, 8));
-        else if (type == 1)
-            this.setSprite(itemSheet.crop(8, 0, 8, 8));
-        else if (type == 2)
-            this.setSprite(itemSheet.crop(16, 0, 8, 8));
+    public BufferedImage getSprite() {
+        return this.sprite;
+    }
 
+    public void drawSprite(Graphics2D g, int x, int y) {
+        if(sprite != null)
+        g.drawImage(sprite, x - sprite.getWidth() / 2, y - sprite.getHeight() / 2, sprite.getWidth(), sprite.getHeight(), null);
     }
 
     public void render(Graphics2D g) {
-        g.setColor(Color.WHITE);
-        if (sprite != null)
-            g.drawImage(sprite, (int) super.getBounds().getX(), (int) super.getBounds().getY(),
-                    (int) super.getBounds().getWidth(), (int) super.getBounds().getHeight(), null);
-        else
-            g.fill(getBounds());
+        if(sprite != null)
+        g.drawImage(sprite, (int) this.getBounds().getX(), (int) this.getBounds().getY(), sprite.getWidth(), sprite.getHeight(), null);
 
     }
 

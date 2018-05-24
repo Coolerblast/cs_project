@@ -35,6 +35,7 @@ public class GameState extends State {
     private LinkedList<Item> items;
     private int maxItems = 401;
     private ThreadPool pool;
+    private Item onCursor;
 
     private ParallaxEngine parallaxEngine;
 
@@ -154,20 +155,24 @@ public class GameState extends State {
 
         g.setColor(Color.GREEN);
 
-        g.drawString("HOLDING: " + player.getCurrentBlock(), 10 + cam.getX(), 20 + cam.getY());
-
-        drawPlayerHealth(g);
 
 //        for (Point p : points)
 //            g.draw(new Rectangle(p));
+
+        g.translate(cam.getX(), cam.getY());
+
+        drawPlayerHealth(g);
+        player.drawInventory(g);
+
+        g.translate(-cam.getX(), -cam.getY());
     }
 
     public void update() {
         player.update();
         zombie.update();
 
-        if (player.getPlacingBlocks())
-            placeBlock(player.getCurrentBlock(), GamePanel.getMainJFrame().getContentPane().getMousePosition());
+//        if (player.getPlacingBlocks())
+//            placeBlock(player.getCurrentBlock(), GamePanel.getMainJFrame().getContentPane().getMousePosition());
         if (player.getBreakingBlocks())
             breakBlock(GamePanel.getMainJFrame().getContentPane().getMousePosition());
 
@@ -276,13 +281,18 @@ public class GameState extends State {
         if (type == 2 && tile[by - 1][bx].getType() == 3)
             tile[by - 1][bx].clear();
         this.tile[by][bx].clear();
-        items.add(new Item(type, true, bx * Tile.getTileSize(), by * Tile.getTileSize()));
-        if (items.size() > maxItems)
-            items.removeFirst();
 
         points.add(mouseLocation);
 
         // System.out.println("Broke a block!");
+    }
+
+    public void setOnCursor(Item item) {
+        onCursor = item;
+    }
+
+    public Item getOnCursor() {
+        return onCursor;
     }
 
     public void save() {
@@ -310,9 +320,9 @@ public class GameState extends State {
     }
 
     private void drawPlayerHealth(Graphics2D g) {
-        int barLengthFromRight = 100;
-        int barLengthFromTop = 50;
-        int barWidth = 1000;
+        int barLengthFromRight = 20;
+        int barLengthFromTop = 30;
+        int barWidth = 500;
         int barHeight = 30;
 
         Color missingColor = Color.black;
@@ -320,12 +330,12 @@ public class GameState extends State {
         Color borderColor = Color.white;
 
         g.setColor(missingColor);
-        g.fillRect((int) (cam.getX() + GamePanel.getMainJFrame().getWidth() - barWidth - barLengthFromRight), (int) cam.getY() + barLengthFromTop, barWidth, barHeight);
+        g.fillRect((int) (GamePanel.getMainJFrame().getWidth() - barWidth - barLengthFromRight), barLengthFromTop, barWidth, barHeight);
         g.setColor(healthColor);
-        g.fillRect((int) (cam.getX() + GamePanel.getMainJFrame().getWidth() - barWidth - barLengthFromRight), (int) cam.getY() + barLengthFromTop, (int) (((double) player.getHealth() / player.getMaxHealth()) * barWidth), barHeight);
+        g.fillRect((int) ( GamePanel.getMainJFrame().getWidth() - barWidth - barLengthFromRight), barLengthFromTop, (int) (((double) player.getHealth() / player.getMaxHealth()) * barWidth), barHeight);
         g.setColor(borderColor);
-        g.setStroke(new BasicStroke(3));
-        g.drawRect((int) (cam.getX() + GamePanel.getMainJFrame().getWidth() - barWidth - barLengthFromRight), (int) cam.getY() + barLengthFromTop, barWidth, barHeight);
+        g.setStroke(new BasicStroke(2));
+        g.drawRect((int) (GamePanel.getMainJFrame().getWidth() - barWidth - barLengthFromRight), barLengthFromTop, barWidth, barHeight);
     }
 
     public void drawCollisionBounds(Graphics2D g) {

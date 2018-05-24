@@ -21,13 +21,11 @@ public class MouseWheelInput implements MouseWheelListener {
 		if (State.getState() == gameState) {
 			// away
 			if (e.getWheelRotation() < 0) {
-
-				player.rotateBlockUp();
+				player.scrollHotbarSlot(1);
 			}
 			// towards
 			else if (e.getWheelRotation() > 0) {
-
-				player.rotateBlockDown();
+				player.scrollHotbarSlot(-1);
 			}
 		}
 	}

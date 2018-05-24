@@ -16,7 +16,7 @@ public abstract class Entity {
     private int SIDE_COLLISION_WIDTH, SIDE_COLLISION_HEIGHT;
 
     private double x, y, yVel, xVel;
-    private boolean falling, canJump;
+    protected boolean falling, canJump;
 
     private Rectangle entity;
 
