@@ -10,7 +10,7 @@ public class Zombie extends Enemy {
 
 
     public Zombie(int w, int h, int health) {
-        super(w, h, health, 5, 10);
+        super(w, h, health, 5, 10, 10);
         super.setWalkAnimation(new Animation(new SpriteSheet(ImageLoader.loadImage(zombieWalkSpriteLoc)), 0, 0, 50, 50, 11  ));
         super.setAttackAnimation(new Animation(new SpriteSheet(ImageLoader.loadImage(zombieAttackSpriteLoc)), 0, 0, 50, 50, 10  ));
 
